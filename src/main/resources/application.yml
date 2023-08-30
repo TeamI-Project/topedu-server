@@ -1,0 +1,73 @@
+spring:
+  profiles:
+    group: # Run - Edit Configurations - Active Profiles에서 설정
+      dev: common, dev
+      prod: common, prod
+---
+spring:
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 300MB
+  config:
+    activate:
+      on-profile: "common"
+  sql:
+    init:
+      platform: mysql
+  datasource:
+    url: jdbc:mysql://${TOPEDU_DB_HOST}:${TOPEDU_DB_PORT}/${TOPEDU_DB_NAME}?autoReconnect=true&setTimezone=Asia/Seoul
+    username: ${TOPEDU_DB_USERNAME}
+    password: ${TOPEDU_DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    database: mysql
+
+server:
+  port: 8080
+
+cloud:
+  aws:
+    credentials:
+      accessKey: ${TOPEDU_AWS_ACCESS_KEY}
+      secretKey: ${TOPEDU_AWS_SECRET_KEY}
+    s3: #버킷이름
+      bucket: ${TOPEDU_AWS_S3_BUCKET}
+    region: #S3 지역
+      static: ${TOPEDU_AWS_S3_REGION}
+    stack:
+      auto: false
+
+---
+spring:
+  config:
+    activate:
+      on-profile: "prod"
+  jpa:
+    hibernate:
+      ddl-auto: none
+    generate-ddl: false # 실행되는 쿼리문 보여주기 여부
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+---
+spring:
+  config:
+    activate:
+      on-profile: "dev"
+  jpa:
+    open-in-view: true
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: true
+        highlight_sql: true
+logging:
+  level:
+    org:
+      hibernate:
+        type.descriptor.sql: trace
+        SQL: debug
